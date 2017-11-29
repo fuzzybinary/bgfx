@@ -2696,9 +2696,19 @@ void ImGui::EndFrame()
                 FocusWindow(g.HoveredWindow);
                 if (!(g.HoveredWindow->Flags & ImGuiWindowFlags_NoMove))
                 {
-                    g.MovedWindow = g.HoveredWindow;
-                    g.MovedWindowMoveId = g.HoveredRootWindow->MoveId;
-                    SetActiveID(g.MovedWindowMoveId, g.HoveredRootWindow);
+                    bool shouldMove = true;
+                    if (g.HoveredWindow->Flags & ImGuiWindowFlags_TitleMove)
+                    {
+                        ImRect title_bar_rect = g.HoveredWindow->TitleBarRect();
+                        shouldMove = IsMouseHoveringRect(title_bar_rect.Min, title_bar_rect.Max, false);
+                    }
+                    
+                    if (shouldMove)
+                    {
+                        g.MovedWindow = g.HoveredWindow;
+                        g.MovedWindowMoveId = g.HoveredRootWindow->MoveId;
+                        SetActiveID(g.MovedWindowMoveId, g.HoveredRootWindow);
+                    }
                 }
             }
             else if (g.NavWindow != NULL && GetFrontMostModalRootWindow() == NULL)
